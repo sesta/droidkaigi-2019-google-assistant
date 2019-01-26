@@ -1,6 +1,7 @@
 import {
   dialogflow,
-  DialogflowConversation
+  DialogflowConversation,
+  Parameters
 } from 'actions-on-google'
 import { https } from 'firebase-functions'
 import * as moment from 'moment-timezone'
@@ -18,8 +19,17 @@ app.intent('NextSessionTime', async(conv: DialogflowConversation) => {
   conv.ask('他に知りたいことはありますか？')
 })
 
-app.intent('SessionInfo', async(conv: DialogflowConversation) => {
-  const session = getSession('69854')
+app.intent('SessionInfo', async(conv: DialogflowConversation, parameters: Parameters) => {
+  const { id } = parameters
+  if (typeof id !== 'string') {
+    conv.close('メンテナンス中です。時間をおいて利用してください。')
+    console.log('不正なパラメータが渡されました')
+    console.log(id)
+
+    return
+  }
+
+  const session = getSession(id)
   if (session === undefined) {
     conv.ask('セッションが見つかりませんでした。')
     conv.ask('他に知りたいことはありますか？')
