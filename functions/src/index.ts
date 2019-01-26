@@ -3,6 +3,7 @@ import {
   DialogflowConversation
 } from 'actions-on-google'
 import { https } from 'firebase-functions'
+import * as moment from 'moment-timezone'
 
 import { getNextSessionTimeMessage, getSession } from './session'
 
@@ -18,9 +19,17 @@ app.intent('NextSessionTime', async(conv: DialogflowConversation) => {
 })
 
 app.intent('SessionInfo', async(conv: DialogflowConversation) => {
-  const session = getSession()
-  const date = session.startDatetime.format('M月D日')
-  const time = session.startDatetime.format('HH:mm')
+  const session = getSession('69854')
+  if (session === undefined) {
+    conv.ask('セッションが見つかりませんでした。')
+    conv.ask('他に知りたいことはありますか？')
+
+    return
+  }
+
+  const startTime = moment(session.startDatetime)
+  const date = startTime.format('M月D日')
+  const time = startTime.format('HH:mm')
   conv.ask(`「${session.name}」ですね。${date}に、${session.place}で${time}から始まります。`)
   conv.ask('他に知りたいことはありますか？')
 })

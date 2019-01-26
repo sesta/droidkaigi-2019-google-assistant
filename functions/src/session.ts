@@ -1,21 +1,18 @@
-import * as moment from 'moment-timezone'
-moment.tz.setDefault('Asia/Tokyo')
+import { sessionMap } from './timetable'
 
-interface Session {
-  id: Number
+export interface Session {
   name: string
   place: string
-  startDatetime: moment.Moment
+  startDatetime: string
 }
 
-export function getSession(): Session {
-  // TODO: 受け取ったセッションの情報を返せるようにする
-  return {
-    id: 69854,
-    name: 'ちゃんとつくる Google Assistant アプリ',
-    place: 'Room 1',
-    startDatetime: moment('2019-02-07 15:40'),
+export function getSession(id: string): Session|undefined {
+  if (!(id in sessionMap)) {
+    // Dialogflowの設定がおかしいはずなので、エラー投げてもいいかも
+    return undefined
   }
+
+  return sessionMap[id]
 }
 
 export function getNextSessionTimeMessage(): string {
